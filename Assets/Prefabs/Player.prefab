@@ -177,16 +177,19 @@ MonoBehaviour:
   boxCastHeight: 0.1
   checkDistance: 0.1
   boxSize: {x: 1, y: 0.1, z: 1}
+  isGrounded: 0
   initialColorLinearValue: 0
   jumpColorCost: 20
   dashColorCost: 30
   colorRegenRate: 0.25
   initialBackgroundColor: {r: 1, g: 1, b: 1, a: 0}
+  currentPlayerColor: {r: 0, g: 0, b: 0, a: 0}
   regenStartTime: 1
   jumpForce: 4
-  dashSpeed: 4
-  dashCooldown: 0.25
+  dashSpeed: 6
+  dashCooldown: 0.8
   slideSpeed: 13
+  minSwipeMagnitude: 100
   playerSpriteRenderer: {fileID: 137879376835355699}
   deathHeight: 0
 --- !u!54 &2204543739590598841

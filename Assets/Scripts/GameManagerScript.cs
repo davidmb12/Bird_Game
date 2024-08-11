@@ -65,13 +65,21 @@ public class GameManagerScript : MonoBehaviour
         }
     }
 
-    public void HandleGameOver()
+    public void HandleGameOver(int currentScore)
     {
+        int maxScore = PlayerPrefs.GetInt("MaxScore",0);
+        if(currentScore > maxScore)
+        {
+            PlayerPrefs.SetInt("MaxScore", currentScore);
+        }
+
         gameStarted = false;
         currentGameState = GameState.Menu;
         CameraManager.Instance.ResetCameraPosition();
         ResetMenuUI();
         levelManager.DeSpawnLevel();
+
+        AudioManager.Instance.StopMusic();
     }
     public void StartGame()
     {
@@ -82,12 +90,15 @@ public class GameManagerScript : MonoBehaviour
         gameStarted = true;
         currentGameState = GameState.InGame;
         levelManager.SpawnLevel();
-        
+        AudioManager.Instance.StartMusic();
+
     }
     public void ResetMenuUI()
     {
         colorManager.ChangeBackgroundColor(Color.black);
         startButton.SetActive(true);
+        UIManager.Instance.GetMaxScore();
+        UIManager.Instance.ResetScore();
     }
 
     public void GoToNextScene()

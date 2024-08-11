@@ -53,6 +53,8 @@ public class PlayerController : MonoBehaviour
     float dashCooldown;
     [SerializeField]
     float slideSpeed;
+    [SerializeField]
+    float minSwipeMagnitude;
     bool isSliding;
     [SerializeField]
     SpriteRenderer playerSpriteRenderer;
@@ -63,24 +65,37 @@ public class PlayerController : MonoBehaviour
     float deathHeight;
 
     int currentScore;
+
+    Vector2 startTouchPosition;
+    Vector2 endTouchPosition;
+
+    Vector2 touchDirection;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
     }
     private void Start()
     {
+        startTouchPosition = Vector3.zero;
+
         animationHandler = GetComponentInChildren<AnimationHandler>();
         gameManager = GameManagerScript.Instance;
         colorManager = ColorManager.Instance;
+        
         UIManager.Instance.SetPlayerController(this);
         initialColorLinearValue = initialBackgroundColor.r;
         currentColorLinearValue = initialColorLinearValue;
-        canRegenColor = true;
+        
         isSliding = false;
+        isGrounded = false;
+
+        canRegenColor = true;
+        canJump = true;
         canDash = true;
+        
         currentScore = 0;
         currentPlayerColor = Color.white;
-        isGrounded = false;
     }
     void HandlePlayerColor()
     {
@@ -90,12 +105,10 @@ public class PlayerController : MonoBehaviour
 
     void HandleJump()
     {
+
         if (canJump)
-        {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                Jump();
-            }
+        {   
+            Jump();    
         }
         else
         {
@@ -119,19 +132,15 @@ public class PlayerController : MonoBehaviour
     {
         if (canDash)
         {
-            if (Input.GetKeyDown(KeyCode.LeftShift))
-            {
-                Dash();
-            }
+            Dash();
         }
         
     }
 
     void Dash()
     {
-        rb.useGravity = false;
         rb.velocity = Vector3.zero;
-        rb.AddForce(Vector2.right * dashSpeed, ForceMode.Impulse);
+        rb.AddForce(touchDirection.normalized * dashSpeed, ForceMode.Impulse);
         currentColorLinearValue -= dashColorCost / 100;
         canDash = false;
         StartCoroutine(DashCoolDown());
@@ -161,22 +170,41 @@ public class PlayerController : MonoBehaviour
         {
             if (transform.right != new Vector3(1, 0, 0))
             {
-                transform.right = Vector3.Lerp(transform.right,new Vector3(1,0,0), 0.5f);
+                transform.right = Vector3.Lerp(transform.right, new Vector3(1, 0, 0), 0.5f);
             }
-            if(transform.position.x < 0)
+        }
+        foreach (Touch touch  in Input.touches)
+        {
+            if(touch.phase == TouchPhase.Began)
             {
-                rb.AddForce(Vector3.right * 0.2f, ForceMode.Force);
+                startTouchPosition = touch.position;
             }
-            
+
+            if(touch.phase == TouchPhase.Ended)
+            {
+                endTouchPosition = touch.position;
+                if (currentColorLinearValue > 0f)
+                {
+                    Debug.Log("Current Color value is greater than 0");
+                    if (!CheckSwipe())
+                    {
+                        HandleJump();
+                    }
+                    else
+                    {
+
+                        HandleDash();
+                    }
+                }
+                
+            }
         }
         
+        
+
         HandlePlayerColor();
-        if(currentColorLinearValue >0f)
-        {
-            HandleJump();
-            HandleDash();
-        }
-        else if(currentColorLinearValue <=0)
+        
+        if(currentColorLinearValue <=0)
         {
             canRegenColor = false;
             canJump = false;
@@ -187,7 +215,17 @@ public class PlayerController : MonoBehaviour
 
 
     }
+    bool CheckSwipe()
+    {
+        touchDirection =endTouchPosition- startTouchPosition;
+        float touchMagnitude = touchDirection.magnitude;
+        if(touchMagnitude>minSwipeMagnitude)
+        {
+            return true;
+        }
+        return false;
 
+    }
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.collider.CompareTag("Death"))
@@ -226,7 +264,7 @@ public class PlayerController : MonoBehaviour
     }
     void HandleDeath()
     {
-        gameManager.HandleGameOver();
+        gameManager.HandleGameOver(currentScore);
         Destroy(gameObject);
     }
     void HandleSlide(Vector3 normal)
