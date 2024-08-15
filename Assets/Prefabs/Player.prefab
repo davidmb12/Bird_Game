@@ -148,8 +148,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 6538156438224409445}
   - {fileID: 4266733588030317702}
@@ -180,14 +180,14 @@ MonoBehaviour:
   isGrounded: 0
   initialColorLinearValue: 0
   jumpColorCost: 20
-  dashColorCost: 30
+  dashColorCost: 35
   colorRegenRate: 0.25
   initialBackgroundColor: {r: 1, g: 1, b: 1, a: 0}
   currentPlayerColor: {r: 0, g: 0, b: 0, a: 0}
-  regenStartTime: 1
-  jumpForce: 4
+  regenStartTime: 0.45
+  jumpForce: 2.8
   dashSpeed: 6
-  dashCooldown: 0.8
+  dashCooldown: 0.5
   slideSpeed: 13
   minSwipeMagnitude: 100
   playerSpriteRenderer: {fileID: 137879376835355699}
@@ -200,7 +200,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6858905009891895418}
   serializedVersion: 4
-  m_Mass: 1
+  m_Mass: 0.7
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}

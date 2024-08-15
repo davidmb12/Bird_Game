@@ -10,6 +10,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] RectTransform uiCanvas;
     [SerializeField] TextMeshProUGUI scoreText;
     [SerializeField] TextMeshProUGUI maxScoreText;
+    [SerializeField] TextMeshProUGUI lastScoreText;
     [SerializeField] RectTransform fadeCanvas;
     [SerializeField] PlayerController playerController;
 
@@ -41,12 +42,28 @@ public class UIManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ColorManager.Instance.ChangeScoreTextColor(playerController.currentPlayerColor);
+        if (playerController)
+        {
+            ColorManager.Instance.ChangeScoreTextColor(playerController.currentPlayerColor);
+        }
     }
+    public void HideScoreText()
+    {
+        scoreText.transform.gameObject.SetActive(false);
+    }
+    public void ShowScoreText()
+    {
+        scoreText.transform.gameObject.SetActive(true);
 
+    }
     public void UpdateScore(int currentScore)
     {
         scoreText.text = currentScore.ToString();
+    }
+
+    public void UpdateLastScore(int lastScore)
+    {
+        lastScoreText.text = lastScore.ToString();
     }
     public void ResetScore()
     {

@@ -71,9 +71,11 @@ public class LevelManager : MonoBehaviour
 
         }
     }
-    private void Update()
+    
+
+    private void FixedUpdate()
     {
-        if(randomLevel)
+        if (randomLevel)
         {
             HandleRandomLevelSpawning();
         }

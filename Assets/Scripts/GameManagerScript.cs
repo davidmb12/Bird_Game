@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class GameManagerScript : MonoBehaviour
 {
     public static GameManagerScript Instance;
+    int gamePlayed = 0;
 
     [Header("References")]
     [SerializeField]
@@ -42,7 +43,9 @@ public class GameManagerScript : MonoBehaviour
     // Start is called before the first frame update
     private void Awake()
     {
-        if(Instance == null)
+        Application.targetFrameRate = 60;
+
+        if (Instance == null)
         {
             Instance = this;
         }
@@ -54,8 +57,10 @@ public class GameManagerScript : MonoBehaviour
         currentGameState = GameState.Menu;
         gameStarted = false;
         levelManager = LevelManager.Instance;
+        levelManager.SpawnLevel();
+
     }
-    
+
     // Update is called once per frame
     void Update()
     {
@@ -67,6 +72,8 @@ public class GameManagerScript : MonoBehaviour
 
     public void HandleGameOver(int currentScore)
     {
+        UIManager.Instance.UpdateLastScore(currentScore);
+        UIManager.Instance.HideScoreText();
         int maxScore = PlayerPrefs.GetInt("MaxScore",0);
         if(currentScore > maxScore)
         {
@@ -74,22 +81,27 @@ public class GameManagerScript : MonoBehaviour
         }
 
         gameStarted = false;
+        gamePlayed += 1;
         currentGameState = GameState.Menu;
         CameraManager.Instance.ResetCameraPosition();
         ResetMenuUI();
         levelManager.DeSpawnLevel();
 
         AudioManager.Instance.StopMusic();
+        if(gamePlayed%5 == 0)
+        {
+            AdsManager.Instance.interstitialAds.ShowInterstitialAd();
+        }
     }
     public void StartGame()
     {
+        UIManager.Instance.ShowScoreText();
         mainCam.backgroundColor = initBackgroundColor;
         var player= Instantiate(playerPrefab);
         CameraManager.Instance.SetPlayerController(player.GetComponent<PlayerController>());
         startButton.SetActive(false);
         gameStarted = true;
         currentGameState = GameState.InGame;
-        levelManager.SpawnLevel();
         AudioManager.Instance.StartMusic();
 
     }

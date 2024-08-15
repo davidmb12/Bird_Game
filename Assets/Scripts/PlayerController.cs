@@ -112,7 +112,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            if (currentColorLinearValue > (jumpColorCost / 100f))
+            if (currentColorLinearValue > 0.2f)
             {
                 canJump = true;
             }
@@ -162,46 +162,40 @@ public class PlayerController : MonoBehaviour
     {
         CheckGround();
 
-        if (isGrounded)
-        {
-            transform.Translate(Vector3.left * LevelManager.Instance.currentLevelSpeed * Time.deltaTime);
-        }
-        else
-        {
-            if (transform.right != new Vector3(1, 0, 0))
-            {
-                transform.right = Vector3.Lerp(transform.right, new Vector3(1, 0, 0), 0.5f);
-            }
-        }
+        
         foreach (Touch touch  in Input.touches)
         {
-            if(touch.phase == TouchPhase.Began)
+            Vector2 touchPosition = Camera.main.ScreenToViewportPoint(touch.position);
+            Debug.Log(touchPosition);
+            if (touchPosition.x <= 0.5f)
             {
-                startTouchPosition = touch.position;
-            }
-
-            if(touch.phase == TouchPhase.Ended)
-            {
-                endTouchPosition = touch.position;
-                if (currentColorLinearValue > 0f)
+                if (touch.phase == TouchPhase.Began)
                 {
-                    Debug.Log("Current Color value is greater than 0");
-                    if (!CheckSwipe())
-                    {
-                        HandleJump();
-                    }
-                    else
-                    {
-
-                        HandleDash();
-                    }
+                    HandleJump();
                 }
-                
-            }
-        }
-        
-        
+            }else if(touchPosition.x > 0.5f)
+            {
+                if (touch.phase == TouchPhase.Began)
+                {
+                    startTouchPosition = touch.position;
+                }
 
+                if (touch.phase == TouchPhase.Ended)
+                {
+                    endTouchPosition = touch.position;
+                    if (currentColorLinearValue > 0f)
+                    {
+                        if (CheckSwipe())
+                        {
+
+                            HandleDash();
+                        }
+                    }
+
+                }
+            }
+            
+        }
         HandlePlayerColor();
         
         if(currentColorLinearValue <=0)
@@ -214,6 +208,20 @@ public class PlayerController : MonoBehaviour
         colorManager.ChangeBackgroundColor(new Color(currentColorLinearValue, currentColorLinearValue, currentColorLinearValue));
 
 
+    }
+    private void FixedUpdate()
+    {
+        if (isGrounded)
+        {
+            transform.Translate(Vector3.left * LevelManager.Instance.currentLevelSpeed * Time.deltaTime);
+        }
+        else
+        {
+            if (transform.right != new Vector3(1, 0, 0))
+            {
+                transform.right = Vector3.Lerp(transform.right, new Vector3(1, 0, 0), 0.5f);
+            }
+        }
     }
     bool CheckSwipe()
     {
